@@ -10,13 +10,13 @@ resource "google_container_cluster" "primary" {
   network    = google_compute_network.vpc.name
   subnetwork = google_compute_subnetwork.gke_subnet.name
 
-  # VPC-native — usa os secondary ranges que criamos na rede
+  # VPC-native — uses the secondary ranges defined in the subnet for Pods and Services
   ip_allocation_policy {
     cluster_secondary_range_name  = "pods"
     services_secondary_range_name = "services"
   }
 
-  # Workload Identity — forma segura de dar permissões GCP aos Pods
+  # Workload Identity — safe way to provide GCP permissions to workloads running in the cluster
   workload_identity_config {
     workload_pool = "${var.project_id}.svc.id.goog"
   }
