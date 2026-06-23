@@ -1,37 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: orders-service
+  name: inventory-service
   labels:
-    app: orders-service
+    app: inventory-service
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: orders-service
+      app: inventory-service
   template:
     metadata:
       labels:
-        app: orders-service
+        app: inventory-service
     spec:
       containers:
-        - name: orders-service
-          image: southamerica-east1-docker.pkg.dev/allianceit-gke-lab/allianceit-images/orders-service:v1
+        - name: inventory-service
+          image: southamerica-east1-docker.pkg.dev/allianceit-gke-lab/allianceit-images/inventory-service:v1
           ports:
-            - containerPort: 3001
+            - containerPort: 3002
           env:
             - name: PORT
-              value: "3001"
+              value: "3002"
           readinessProbe:
             httpGet:
               path: /health
-              port: 3001
+              port: 3002
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /health
-              port: 3001
+              port: 3002
             initialDelaySeconds: 15
             periodSeconds: 20
           resources:
@@ -45,11 +45,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: orders-service
+  name: inventory-service
 spec:
   selector:
-    app: orders-service
+    app: inventory-service
   ports:
-    - port: 3001
-      targetPort: 3001
+    - port: 3002
+      targetPort: 3002
   type: ClusterIP
