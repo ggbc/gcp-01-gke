@@ -3,6 +3,7 @@ const http = require('http');
 const orders = [
   { id: 1, product: 'Fuel Tank A', quantity: 100, status: 'pending' },
   { id: 2, product: 'Fuel Tank B', quantity: 200, status: 'delivered' },
+  { id: 3, product: 'Fuel Tank C', quantity: 350, status: 'in_transit' },
 ];
 
 const server = http.createServer((req, res) => {
