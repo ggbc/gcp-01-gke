@@ -3,18 +3,21 @@ kind: Config
 metadata:
   name: allianceit-gke
 
+manifests:
+  rawYaml:
+    - k8s/orders-service.yaml
+    - k8s/inventory-service.yaml
+    - k8s/api-gateway.yaml
+
 deploy:
-  kubectl:
-    manifests:
-      - k8s/orders-service.yaml
-      - k8s/inventory-service.yaml
-      - k8s/api-gateway.yaml
+  kubectl: {}
 
 profiles:
   - name: production
+    manifests:
+      rawYaml:
+        - k8s/orders-service.yaml
+        - k8s/inventory-service.yaml
+        - k8s/api-gateway.yaml
     deploy:
-      kubectl:
-        manifests:
-          - k8s/orders-service.yaml
-          - k8s/inventory-service.yaml
-          - k8s/api-gateway.yaml
+      kubectl: {}
