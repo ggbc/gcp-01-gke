@@ -1,0 +1,67 @@
+steps:
+  # Build das imagens
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGISTRY}/orders-service:${SHORT_SHA}'
+      - 'apps/orders-service/'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGISTRY}/inventory-service:${SHORT_SHA}'
+      - 'apps/inventory-service/'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGISTRY}/api-gateway:${SHORT_SHA}'
+      - 'apps/api-gateway/'
+
+  # Push das imagens para o Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGISTRY}/orders-service:${SHORT_SHA}'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGISTRY}/inventory-service:${SHORT_SHA}'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGISTRY}/api-gateway:${SHORT_SHA}'
+
+  # Atualiza os manifests com a nova tag de imagem
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        sed -i "s|:v1|:${SHORT_SHA}|g" k8s/orders-service.yaml
+        sed -i "s|:v1|:${SHORT_SHA}|g" k8s/inventory-service.yaml
+        sed -i "s|:v1|:${SHORT_SHA}|g" k8s/api-gateway.yaml
+
+  # Cria um release no Cloud Deploy
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'deploy'
+      - 'releases'
+      - 'create'
+      - 'release-${SHORT_SHA}'
+      - '--delivery-pipeline=allianceit-pipeline'
+      - '--region=${_REGION}'
+      - '--source=.'
+      - '--skaffold-file=skaffold.yaml'
+
+substitutions:
+  _REGISTRY: 'southamerica-east1-docker.pkg.dev/allianceit-gke-lab/allianceit-images'
+  _REGION: 'southamerica-east1'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
