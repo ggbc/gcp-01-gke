@@ -8,3 +8,8 @@ terraform.tfvars
 # OS
 .DS_Store
 *.log
+
+# Python
+__pycache__/
+vertex/trainer/.venv/
+*.pyc
